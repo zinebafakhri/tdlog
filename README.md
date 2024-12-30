@@ -89,7 +89,7 @@ L'algorithme utilisé repose sur le **clustering K-Medoids**, une méthode robus
 
 ### Forme générale du projet:
 
-delivery_platform_finale/
+delivery_platform
 ├── manage.py                   # Script principal pour gérer les commandes Django
 ├── db.sqlite3                  # Base de données SQLite utilisée pour stocker les données
 ├── delivery_platform/          # Répertoire principal de l'application Django
