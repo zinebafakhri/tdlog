@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimized Delivery Routes</title>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet-polylinedecorator"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header {
+            background-color: #0078D7;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+        #map {
+            width: 80%;
+            height: 500px;
+            margin: 20px auto;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+        .button-container {
+            margin: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #0078D7;
+            color: white;
+        }
+        button:hover {
+            background-color:rgb(163, 0, 0);
+        }
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+        }
+        .legend div {
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+        .legend i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Let's optimize your delivery route!</h1>
+    </header>
+    <div id="map"></div>
+    <div class="button-container">
+        <button id="recalculate">Calculate my direction</button>
+        <button id="reset">Reset my delivery points</button>
+    </div>
+    <!-- Legend -->
+    <div class="legend">
+        <div><i class="fas fa-map-marker-alt" style="color: green;"></i> First Point</div>
+        <div><i class="fas fa-map-marker-alt" style="color: orange;"></i> Waypoint</div>
+        <div><i class="fas fa-map-marker-alt" style="color: red;"></i> End Point</div>
+        <div><i class="fas fa-long-arrow-alt-right" style="color: blue;"></i> Route Direction</div>
+    </div>
+
+    <script>
+        const map = L.map('map').setView([33.5731, -7.5898], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19
+        }).addTo(map);
+
+        const markers = [];
+        let routes = [];
+        let startIcon = L.divIcon({ html: '<i class="fas fa-map-marker-alt" style="color: green; font-size: 20px;"></i>', className: 'start-marker' });
+        let stopIcon = L.divIcon({ html: '<i class="fas fa-map-marker-alt" style="color: red; font-size: 20px;"></i>', className: 'stop-marker' });
+        let stepIcon = L.divIcon({ html: '<i class="fas fa-map-marker-alt" style="color: orange; font-size: 16px;"></i>', className: 'step-marker' });
+
+        // Add marker on map click
+        map.on('click', (e) => {
+            const { lat, lng } = e.latlng;
+            const markerIcon = markers.length === 0 ? startIcon : stepIcon;
+            const marker = L.marker([lat, lng], { icon: markerIcon, draggable: true }).addTo(map);
+            marker.bindPopup(`Lat: ${lat}, Lng: ${lng}`).openPopup();
+            markers.push(marker);
+        });
+
+        // Recalculate routes with new points
+        document.getElementById('recalculate').addEventListener('click', () => {
+            const points = markers.map(marker => marker.getLatLng());
+            if (points.length > 1) {
+                // Add stop icon to the last marker
+                markers[markers.length - 1].setIcon(stopIcon);
+
+                fetch('/recalculate_routes/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ points })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        // Remove existing routes
+                        routes.forEach(route => map.removeLayer(route));
+                        routes = [];
+
+                        // Draw new routes with arrows
+                        data.routes.forEach(route => {
+                            const polyline = L.polyline(route, { color: 'blue', weight: 3 }).addTo(map);
+                            const decorator = L.polylineDecorator(polyline, {
+                                patterns: [
+                                    { offset: '10%', repeat: '20%', symbol: L.Symbol.arrowHead({ pixelSize: 10, polygon: true, pathOptions: { color: 'blue', fillColor: 'blue', fillOpacity: 0.8 } }) }
+                                ]
+                            });
+                            routes.push(polyline);
+                            routes.push(decorator);
+                        });
+                    })
+                    .catch(err => console.error('Error:', err));
+            } else {
+                alert('Please add at least two points to calculate a route.');
+            }
+        });
+
+        // Reset map
+        document.getElementById('reset').addEventListener('click', () => {
+            // Remove all markers and routes
+            markers.forEach(marker => map.removeLayer(marker));
+            markers.length = 0;
+
+            routes.forEach(route => map.removeLayer(route));
+            routes = [];
+        });
+    </script>
+</body>
+</html>
