@@ -29,18 +29,18 @@ Cette plateforme vise à optimiser les trajets de livraison pour les entreprises
 
 L'algorithme utilisé repose sur le **clustering K-Medoids**, une méthode robuste pour regrouper les points de livraison et optimiser les trajets. Voici un résumé de son fonctionnement :
 
-        1. **Regroupement des Points** : 
+        1. *Regroupement des Points** : 
         - Les points de livraison sélectionnés sont regroupés en **clusters** en fonction de leur proximité géographique. 
         - Chaque cluster est centré autour d’un **medoid**, un point réel parmi les données.
 
-        2. **Optimisation Locale des Chemins** : 
+        2. *Optimisation Locale des Chemins** : 
         - Une fois les clusters définis, les chemins optimaux reliant les points de chaque cluster sont calculés.
         - Le medoid est utilisé comme point de départ et d’arrivée.
 
-        3. **Calcul Dynamique** :
+        3. *Calcul Dynamique** :
         - L’algorithme s’adapte en temps réel aux points sélectionnés par l’utilisateur et recalcule les chemins en conséquence.
 
-        4. **Visualisation Intuitive** :
+        4. *Visualisation Intuitive** :
         - Les clusters et les chemins sont affichés sur la carte avec des flèches pour indiquer la direction et des icônes pour marquer les étapes.
 
     Cet algorithme garantit une gestion efficace des livraisons, réduisant les distances parcourues tout en restant robuste face aux données imprécises ou aux anomalies.
