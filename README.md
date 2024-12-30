@@ -23,6 +23,7 @@ Cette plateforme vise à optimiser les trajets de livraison pour les entreprises
 
 4. **Légende dynamique :**
    - Une légende claire pour interpréter les icônes et le parcours.
+     
 
 
 ### Principe de l'Algorithme de Calcul des Chemins Optimaux
