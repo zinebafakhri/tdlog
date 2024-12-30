@@ -71,8 +71,8 @@ L'algorithme utilisé repose sur le **clustering K-Medoids**, une méthode robus
 
 1. Clonez le dépôt Git :
    ```bash
-   git clone https://github.com/username/delivery_platform.git
-   cd delivery_platform
+   git clone https://github.com/username/tdlog/delivery_platform.git
+   cd tdlog/delivery_platform
 
 2. step-by-step sur VS-Code: 
 
